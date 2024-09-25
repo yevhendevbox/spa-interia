@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 //use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Category;
 use App\Models\Product;
-use Illuminate\Http\Request;
+//use Illuminate\Http\Request;
 //use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -38,9 +39,9 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
-        $request->user()->products()->create($request->all());
+        $request->user()->products()->create($request->validated());
 
         return redirect()->route('products.index');
     }
