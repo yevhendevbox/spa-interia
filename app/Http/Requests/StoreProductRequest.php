@@ -38,10 +38,10 @@ class StoreProductRequest extends FormRequest
         ];
     }
 
-    public function prepareForValidation()
-    {
-        return $this->merge([
-            'price' => $this->price * 100
-        ]);
-    }
+//    public function prepareForValidation()
+//    {
+//        return $this->merge([
+//            'price' => $this->price * 100
+//        ]);
+//    }
 }
