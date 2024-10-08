@@ -1,8 +1,11 @@
 <script setup>
+import { ref } from 'vue';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout.vue';
 import { Head, Link, router } from '@inertiajs/vue3';
 import Pagination from '@/Components/Pagination.vue';
 import Sortable from "@/Components/Sortable.vue";
+import Checkbox from "@/Components/Checkbox.vue";
+import CheckAll from "@/Components/CheckAll.vue";
 
 const props = defineProps({
     products: {
@@ -17,6 +20,8 @@ const props = defineProps({
     }
 })
 
+const selectedIds = ref([]);
+
 function handleSearch(e) {
     router.get(route('products.index'), {
         search: e.target.value
@@ -28,6 +33,15 @@ function deleteProduct(id) {
         router.delete(route('products.destroy', id), {
             preserveScroll: true
         });
+    }
+}
+
+function deleteSelected() {
+    if (window.confirm("Are you sure to delete selected products?")) {
+        router.delete(route('products.bulk-destroy', selectedIds.value.join(',')), {
+            preserveScroll: true,
+            onSuccess: () => selectedIds.value = []
+        })
     }
 }
 </script>
@@ -48,6 +62,15 @@ function deleteProduct(id) {
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
 
                 <div class="flex flex-column sm:flex-row flex-wrap space-y-4 sm:space-y-0 items-center justify-end pb-6">
+                    <button type="button"
+                            class="px-3 py-2.5 text-sm font-medium text-center text-white rounded-md"
+                            :class="{ 'bg-red-300 cursor-not-allowed': !selectedIds.length, 'bg-red-500': selectedIds.length }"
+                            :disabled="!selectedIds.length"
+                            @click="deleteSelected"
+                    >
+                        Delete Selected
+                    </button>
+
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
                             <svg class="w-5 h-5 text-gray-500" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path></svg>
@@ -61,6 +84,9 @@ function deleteProduct(id) {
                         <table class="w-full text-sm text-left rtl:text-right text-gray-500">
                             <thead class="text-xs text-gray-700 uppercase bg-gray-50 border-b">
                             <tr>
+                                <th scope="col" class="px-6 py-3" width="5">
+                                    <CheckAll :rows="props.products.data" v-model="selectedIds" />
+                                </th>
                                 <th scope="col" class="px-6 py-3" width="5">
                                     No
                                 </th>
@@ -83,6 +109,9 @@ function deleteProduct(id) {
                             </thead>
                             <tbody>
                             <tr v-for="(product, index) in props.products.data" :key="product.id" class="bg-white border-b hover:bg-gray-50">
+                                <td class="px-6 py-4">
+                                    <Checkbox :value="product.id" v-model:checked="selectedIds"/>
+                                </td>
                                 <td class="px-6 py-4">
                                     {{ props.products.meta.from + index }}
                                 </td>

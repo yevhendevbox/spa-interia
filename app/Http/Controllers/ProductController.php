@@ -115,4 +115,14 @@ class ProductController extends Controller
             ->route('products.index')
             ->with('message', 'Product deleted successfully');
     }
+
+    public function bulkDestroy(string $ids)
+    {
+        $ids = explode(',', $ids);
+        Product::destroy($ids);
+
+        return redirect()
+            ->route('products.index')
+            ->with('message', 'Selected products deleted successfully');
+    }
 }
