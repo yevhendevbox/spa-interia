@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 //use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\BulkUpdateProductRequest;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\CategoryResource;
@@ -45,6 +46,7 @@ class ProductController extends Controller
 
         return inertia('Product/Index', [
             'products' => ProductResource::collection($products),
+            'categories' => CategoryResource::collection(Category::orderBy('name')->get()),
             'query' => (object) request()->query()
         ]);
     }
@@ -102,6 +104,21 @@ class ProductController extends Controller
         return redirect()
             ->route('products.index')
             ->with('message', 'Product updated successfully');
+    }
+
+    /**
+     * BulkUpdate the specified resource in storage.
+     */
+    public function bulkUpdate(BulkUpdateProductRequest $request)
+    {
+        Product::whereIn('id', $request->product_ids)
+            ->update([
+                'category_id' => $request->category_id
+            ]);
+
+        return redirect()
+            ->route('products.index')
+            ->with('message', 'Selected products updated successfully');
     }
 
     /**
